@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MVI Architecture</string>
+    <string name="get_user">Get USER</string>
+    <string name="get_blogs">Get Blogs</string>
+</resources>
