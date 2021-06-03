@@ -7,8 +7,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.cefer.mviarchitecture.R
 import com.cefer.mviarchitecture.databinding.FragmentMainBinding
-import com.cefer.mviarchitecture.ui.main.state.MainStateEvent
-import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.*
+import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.GetBlogPostsEvent
+import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.GetUserEvent
 
 class MainFragment : Fragment() {
 
@@ -38,7 +38,7 @@ class MainFragment : Fragment() {
     }
 
     private fun subscribeObservers() {
-        viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
+        viewModel.dataState.observe(viewLifecycleOwner, { dataState ->
 
             println("DEBUG: DataState: ${dataState}")
             dataState.blogPosts?.let {
@@ -52,7 +52,7 @@ class MainFragment : Fragment() {
             }
         })
 
-        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+        viewModel.viewState.observe(viewLifecycleOwner, { viewState ->
             viewState.blogPosts?.let {
                 // set BlogPosts to RecyclerView
                 println("DEBUG: Setting blog posts to RecyclerView: ${viewState.blogPosts}")
@@ -65,11 +65,11 @@ class MainFragment : Fragment() {
         })
     }
 
-    fun triggerGetUserEvent() {
+    private fun triggerGetUserEvent() {
         viewModel.setStateEvent(GetUserEvent("1"))
     }
 
-    fun triggerGetBlogsEvent() {
+    private fun triggerGetBlogsEvent() {
         viewModel.setStateEvent(GetBlogPostsEvent)
     }
 

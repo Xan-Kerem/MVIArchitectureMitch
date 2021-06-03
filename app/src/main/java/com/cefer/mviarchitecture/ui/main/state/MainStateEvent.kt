@@ -10,5 +10,4 @@ sealed class MainStateEvent {
 
     object None : MainStateEvent()
 
-
 }

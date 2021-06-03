@@ -6,14 +6,13 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.cefer.mviarchitecture.model.BlogPost
 import com.cefer.mviarchitecture.model.User
-
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.*
 import com.cefer.mviarchitecture.ui.main.state.MainViewState
 import com.cefer.mviarchitecture.util.AbsentLiveData
 
 
-class MainViewModel : ViewModel(){
+class MainViewModel : ViewModel() {
 
     private val _stateEvent: MutableLiveData<MainStateEvent> = MutableLiveData()
     private val _viewState: MutableLiveData<MainViewState> = MutableLiveData()
@@ -23,18 +22,18 @@ class MainViewModel : ViewModel(){
 
 
     val dataState: LiveData<MainViewState> = Transformations
-        .switchMap(_stateEvent){stateEvent ->
+        .switchMap(_stateEvent) { stateEvent ->
             stateEvent?.let {
                 handleStateEvent(stateEvent)
             }
         }
 
-    fun handleStateEvent(stateEvent: MainStateEvent): LiveData<MainViewState>{
+    private fun handleStateEvent(stateEvent: MainStateEvent): LiveData<MainViewState> {
         println("DEBUG: New StateEvent detected: $stateEvent")
-        when(stateEvent){
+        when (stateEvent) {
 
             is GetBlogPostsEvent -> {
-                return object: LiveData<MainViewState>(){
+                return object : LiveData<MainViewState>() {
                     override fun onActive() {
                         super.onActive()
                         val blogList: ArrayList<BlogPost> = ArrayList()
@@ -62,7 +61,7 @@ class MainViewModel : ViewModel(){
             }
 
             is GetUserEvent -> {
-                return object: LiveData<MainViewState>(){
+                return object : LiveData<MainViewState>() {
                     override fun onActive() {
                         super.onActive()
                         val user = User(
@@ -77,29 +76,29 @@ class MainViewModel : ViewModel(){
                 }
             }
 
-            is None ->{
+            is None -> {
                 return AbsentLiveData.create()
             }
         }
     }
 
-    fun setBlogListData(blogPosts: List<BlogPost>){
+    fun setBlogListData(blogPosts: List<BlogPost>) {
         val update = getCurrentViewStateOrNew()
         update.blogPosts = blogPosts
         _viewState.value = update
     }
 
-    fun setUser(user: User){
+    fun setUser(user: User) {
         val update = getCurrentViewStateOrNew()
         update.user = user
         _viewState.value = update
     }
 
-    fun getCurrentViewStateOrNew(): MainViewState {
+    private fun getCurrentViewStateOrNew(): MainViewState {
         return viewState.value ?: MainViewState()
     }
 
-    fun setStateEvent(event: MainStateEvent){
+    fun setStateEvent(event: MainStateEvent) {
         _stateEvent.value = event
     }
 }
