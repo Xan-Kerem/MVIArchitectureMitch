@@ -6,10 +6,12 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.cefer.mviarchitecture.model.BlogPost
 import com.cefer.mviarchitecture.model.User
+import com.cefer.mviarchitecture.repo.Repository
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.*
 import com.cefer.mviarchitecture.ui.main.state.MainViewState
 import com.cefer.mviarchitecture.util.AbsentLiveData
+import com.cefer.mviarchitecture.util.DataState
 
 
 class MainViewModel : ViewModel() {
@@ -21,47 +23,23 @@ class MainViewModel : ViewModel() {
         get() = _viewState
 
 
-    val dataState: LiveData<MainViewState> = Transformations
+    val dataState: LiveData<DataState<MainViewState>> = Transformations
         .switchMap(_stateEvent) { stateEvent ->
             stateEvent?.let {
                 handleStateEvent(stateEvent)
             }
         }
 
-    private fun handleStateEvent(stateEvent: MainStateEvent): LiveData<MainViewState> {
+    private fun handleStateEvent(stateEvent: MainStateEvent): LiveData<DataState<MainViewState>> {
         println("DEBUG: New StateEvent detected: $stateEvent")
         when (stateEvent) {
 
             is GetBlogPostsEvent -> {
-                return object : LiveData<MainViewState>() {
-                    override fun onActive() {
-                        super.onActive()
-                        val blogList: ArrayList<BlogPost> = ArrayList()
-                        blogList.add(
-                            BlogPost(
-                                pk = 0,
-                                title = "Vancouver PNE 2019",
-                                body = "Here is Jess and I at the Vancouver PNE. We ate a lot of food.",
-                                image = "https://cdn.open-api.xyz/open-api-static/static-blog-images/image8.jpg"
-                            )
-                        )
-                        blogList.add(
-                            BlogPost(
-                                pk = 1,
-                                title = "Ready for a Walk",
-                                body = "Here I am at the park with my dogs Kiba and Maizy. Maizy is the smaller one and Kiba is the larger one.",
-                                image = "https://cdn.open-api.xyz/open-api-static/static-blog-images/image2.jpg"
-                            )
-                        )
-                        value = MainViewState(
-                            blogPosts = blogList
-                        )
-                    }
-                }
+                return Repository.getBlogPosts()
             }
 
             is GetUserEvent -> {
-                return object : LiveData<MainViewState>() {
+                return object : LiveData<DataState<MainViewState>>() {
                     override fun onActive() {
                         super.onActive()
                         val user = User(
@@ -69,9 +47,9 @@ class MainViewModel : ViewModel() {
                             username = "Cefer",
                             image = "https://cdn.open-api.xyz/open-api-static/static-random-images/logo_1080_1080.png"
                         )
-                        value = MainViewState(
+                        value = DataState.data(data = MainViewState(
                             user = user
-                        )
+                        ))
                     }
                 }
             }
