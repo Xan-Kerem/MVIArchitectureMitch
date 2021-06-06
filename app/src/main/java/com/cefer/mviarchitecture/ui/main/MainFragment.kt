@@ -1,5 +1,6 @@
 package com.cefer.mviarchitecture.ui.main
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -14,6 +15,8 @@ class MainFragment : Fragment() {
     private lateinit var viewModel : MainViewModel
     
     private lateinit var binding : FragmentMainBinding
+    
+    private lateinit var dataStateHandler : DataStateListener
     
     override fun onCreateView(
             inflater : LayoutInflater , container : ViewGroup? ,
@@ -41,6 +44,10 @@ class MainFragment : Fragment() {
         viewModel.dataState.observe(viewLifecycleOwner , { dataState ->
             
             println("DEBUG: DataState: $dataState")
+            
+            // handle loading and message
+            dataStateHandler.onDataStateChange(dataState)
+            
             // handle Data<T>
             dataState.data?.let { mainViewState ->
                 
@@ -55,16 +62,6 @@ class MainFragment : Fragment() {
                 }
             }
             
-            
-            // handle Error
-            dataState.message?.let {
-            
-            }
-            
-            // handle Loading
-            dataState.loading.let {
-            
-            }
         }
         )
         
@@ -102,6 +99,18 @@ class MainFragment : Fragment() {
         }
         
         return super.onOptionsItemSelected(item)
+    }
+    
+    override fun onAttach(context : Context) {
+        super.onAttach(context)
+        
+        try {
+            
+            dataStateHandler = context as DataStateListener
+            
+        } catch (e : ClassCastException) {
+            println("DEBUG: $context must implement DataStateListener")
+        }
     }
 }
 

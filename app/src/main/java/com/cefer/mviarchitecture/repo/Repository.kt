@@ -16,7 +16,10 @@ object Repository {
             
             override fun handleApiSuccessResponse(response : ApiSuccessResponse<List<BlogPost>>) {
                 result.value =
-                        DataState.data(null , MainViewState(blogPosts = response.body , null))
+                        DataState.data(
+                                message = null ,
+                                MainViewState(blogPosts = response.body , user = null)
+                        )
             }
             
             override fun createCall() : LiveData<GenericApiResponse<List<BlogPost>>> {
