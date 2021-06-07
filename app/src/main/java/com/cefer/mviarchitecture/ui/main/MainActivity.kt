@@ -1,7 +1,6 @@
 package com.cefer.mviarchitecture.ui.main
 
 import android.os.Bundle
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
@@ -38,14 +37,16 @@ class MainActivity : AppCompatActivity() , DataStateListener {
     }
     
     private fun handleDataStateChange(dataState : DataState<*>?) {
-        dataState?.let {
+        dataState?.let { dataStateStarProjection ->
             
             // handle loading
-            showProgressBar(it.loading)
-            println("Trace ${it.loading} in MainActivity")
+            showProgressBar(dataStateStarProjection.loading)
+            println("Trace ${dataStateStarProjection.loading} in MainActivity")
             
             // handle message
-            it.message?.let { message -> showToast(message) }
+            dataStateStarProjection.message?.let { event ->
+                event.getContentIfNotHandled()?.let { message -> showToast(message) }
+            }
         }
     }
     

@@ -4,11 +4,13 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.cefer.mviarchitecture.R
 import com.cefer.mviarchitecture.databinding.FragmentMainBinding
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.GetBlogPostsEvent
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.GetUserEvent
+import com.cefer.mviarchitecture.ui.main.state.MainViewState
 
 class MainFragment : Fragment() {
     
@@ -49,31 +51,38 @@ class MainFragment : Fragment() {
             dataStateHandler.onDataStateChange(dataState)
             
             // handle Data<T>
-            dataState.data?.let { mainViewState ->
-                
-                mainViewState.blogPosts?.let {
-                    // set BlogPosts data
-                    viewModel.setBlogListData(it)
+            dataState.data?.let { event ->
+                event.getContentIfNotHandled()?.let { mainViewState ->
+                    mainViewState.blogPosts?.let {
+                        // set BlogPosts data
+                        viewModel.setBlogListData(it)
+                    }
+                    mainViewState.user?.let {
+                        // set User data
+                        viewModel.setUser(it)
+                    }
                 }
                 
-                mainViewState.user?.let {
-                    // set User data
-                    viewModel.setUser(it)
-                }
+                
             }
             
         }
         )
         
-        viewModel.viewState.observe(viewLifecycleOwner , { viewState ->
-            viewState.blogPosts?.let {
-                // set BlogPosts to RecyclerView
-                println("DEBUG: Setting blog posts to RecyclerView: ${viewState.blogPosts}")
-            }
+        viewModel.viewState.observe(viewLifecycleOwner , object : Observer<MainViewState> {
             
-            viewState.user?.let {
-                // set User data to widgets
-                println("DEBUG: Setting User data: ${viewState.user}")
+            override fun onChanged(viewState : MainViewState?) {
+                viewState?.blogPosts?.let {
+                    // set BlogPosts to RecyclerView
+                    println("DEBUG: Setting blog posts to RecyclerView: ${viewState.blogPosts}")
+                }
+                
+                
+                viewState?.user?.let {
+                    // set User data to widgets
+                    println("DEBUG: Setting User data: ${viewState.user}")
+                }
+                
             }
         })
     }
