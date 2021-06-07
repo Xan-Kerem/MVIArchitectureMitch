@@ -15,15 +15,17 @@ object Repository {
         return object : NetworkBoundResource<List<BlogPost> , MainViewState>() {
             
             override fun handleApiSuccessResponse(response : ApiSuccessResponse<List<BlogPost>>) {
+                println("Trace : handleApiSuccessResponse in getBlogPosts")
                 result.value =
                         DataState.data(
                                 message = null ,
                                 MainViewState(blogPosts = response.body , user = null)
                         )
+                println("Trace : handleApiSuccessResponse ${result.value!!.loading} in getBlogPosts")
             }
             
             override fun createCall() : LiveData<GenericApiResponse<List<BlogPost>>> {
-                
+                println("Trace : createCall in getBlogPosts")
                 return RetrofitBuilder.apiService.getBlogPosts()
             }
             

@@ -16,20 +16,24 @@ abstract class NetworkBoundResource<ResponseObject , ViewStateType> {
     
     init {
         result.value = DataState.loading(true)
+        println("Trace : result init in networkbound")
         
         GlobalScope.launch(IO) {
-            
+            println("Trace : IO in networkbound")
             delay(1000)
             
             withContext(Main) {
+                println("Trace : Main in networkbound")
                 
                 val apiResponse = createCall()
                 
                 result.addSource(apiResponse) { genericApiResponse ->
+                    println("Trace : BeforeRemoveResource ${result.value!!.loading} in networkbound")
                     result.removeSource(apiResponse)
+                    println("Trace : removeResource in networkbound")
+                    println("Trace : removeResource ${result.value!!.loading} in networkbound")
                     
                     handleNetworkCall(genericApiResponse)
-                    
                 }
             }
         }
@@ -37,7 +41,7 @@ abstract class NetworkBoundResource<ResponseObject , ViewStateType> {
     }
     
     private fun handleNetworkCall(response : GenericApiResponse<ResponseObject>) {
-        
+        println("Trace : handleNetworkCall in networkbound")
         when (response) {
             is ApiSuccessResponse -> {
                 handleApiSuccessResponse(response)
@@ -63,5 +67,8 @@ abstract class NetworkBoundResource<ResponseObject , ViewStateType> {
     
     abstract fun createCall() : LiveData<GenericApiResponse<ResponseObject>>
     
-    fun asLiveData() = result as LiveData<DataState<ViewStateType>>
+    fun asLiveData() : LiveData<DataState<ViewStateType>> {
+        println("Trace : asLiveData in networkbound")
+        return result
+    }
 }

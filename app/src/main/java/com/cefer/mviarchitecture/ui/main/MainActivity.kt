@@ -2,6 +2,8 @@ package com.cefer.mviarchitecture.ui.main
 
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -40,6 +42,7 @@ class MainActivity : AppCompatActivity() , DataStateListener {
             
             // handle loading
             showProgressBar(it.loading)
+            println("Trace ${it.loading} in MainActivity")
             
             // handle message
             it.message?.let { message -> showToast(message) }
@@ -48,10 +51,10 @@ class MainActivity : AppCompatActivity() , DataStateListener {
     
     private fun showProgressBar(isVisible : Boolean) {
         if (isVisible) {
-            binding.progressBar.visibility = View.VISIBLE
+            binding.progressBar.visibility = VISIBLE
         }
         else {
-            binding.progressBar.visibility = View.GONE
+            binding.progressBar.visibility = GONE
         }
     }
     
