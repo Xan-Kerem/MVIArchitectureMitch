@@ -6,19 +6,31 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.cefer.mviarchitecture.R
 import com.cefer.mviarchitecture.databinding.FragmentMainBinding
+import com.cefer.mviarchitecture.model.BlogPost
+import com.cefer.mviarchitecture.model.User
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.GetBlogPostsEvent
 import com.cefer.mviarchitecture.ui.main.state.MainStateEvent.GetUserEvent
 import com.cefer.mviarchitecture.ui.main.state.MainViewState
+import com.cefer.mviarchitecture.util.TopSpacingItemDecoration
 
-class MainFragment : Fragment() {
+class MainFragment : Fragment() , BlogListAdapter.Interaction {
+    
+    override fun onItemSelected(position : Int , item : BlogPost) {
+        println("DEBUG: CLICKED $position")
+        println("DEBUG: CLICKED $item")
+    }
     
     private lateinit var viewModel : MainViewModel
     
     private lateinit var binding : FragmentMainBinding
     
     private lateinit var dataStateHandler : DataStateListener
+    
+    private lateinit var blogListAdapter : BlogListAdapter
     
     override fun onCreateView(
             inflater : LayoutInflater , container : ViewGroup? ,
@@ -38,6 +50,30 @@ class MainFragment : Fragment() {
         } ?: throw Exception("Invalid Activity")
         
         subscribeObservers()
+        
+        initRecyclerView()
+    }
+    
+    private fun setUserProperties(user : User){
+        binding.apply {
+            email.text = user.email
+            username.text = user.username
+            view?.let {
+                Glide.with(it.context)
+                        .load(user.image)
+                        .into(image)
+            }
+        }
+    }
+    
+    private fun initRecyclerView() {
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(activity)
+            val topSpacingItemDecoration = TopSpacingItemDecoration(30)
+            addItemDecoration(topSpacingItemDecoration)
+            blogListAdapter = BlogListAdapter(this@MainFragment)
+            adapter = blogListAdapter
+        }
     }
     
     private fun subscribeObservers() {
@@ -75,12 +111,14 @@ class MainFragment : Fragment() {
                 viewState?.blogPosts?.let {
                     // set BlogPosts to RecyclerView
                     println("DEBUG: Setting blog posts to RecyclerView: ${viewState.blogPosts}")
+                    blogListAdapter.submitList(it)
                 }
                 
                 
                 viewState?.user?.let {
                     // set User data to widgets
                     println("DEBUG: Setting User data: ${viewState.user}")
+                    setUserProperties(it)
                 }
                 
             }
@@ -121,6 +159,8 @@ class MainFragment : Fragment() {
             println("DEBUG: $context must implement DataStateListener")
         }
     }
+    
+    
 }
 
 
